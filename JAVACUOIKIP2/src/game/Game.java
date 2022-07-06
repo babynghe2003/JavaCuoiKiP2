@@ -36,6 +36,11 @@ import network.custom.spacket.SPacketShoot;
 import network.custom.spacket.SPacketSpawnPlayer;
 import network.custom.CSocket;
 
+import java.io.File;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+
 public class Game extends JPanel implements IRender, MouseListener, MouseMotionListener, KeyListener{
 	public static final int UNIT = 100;
 	private static final long serialVersionUID = 1L;
@@ -125,6 +130,22 @@ public class Game extends JPanel implements IRender, MouseListener, MouseMotionL
 			g2d.drawImage(imageWarning,Math.round(getPlayer().getPosX()-getGame().getWidth()/2),Math.round(getPlayer().getPosY()-getGame().getHeight() / 2), getGame().getWidth(), getGame().getHeight(), null);
 		}		
 	}
+
+	public static synchronized void playSound(final String url) {
+		new Thread(new Runnable() { // the wrapper thread is unnecessary, unless it blocks on the Clip finishing, see comments
+		  public void run() {
+			try {
+			  Clip clip = AudioSystem.getClip();
+			  AudioInputStream inputStream = AudioSystem.getAudioInputStream(Main.class.getResourceAsStream("/assets/Bonus/" + url));
+			  clip.open(inputStream);
+			  clip.start(); 
+			} catch (Exception e) {
+			  System.err.println(e.getMessage());
+			}
+		  }
+		}).start();
+	  }
+
 	public Game getGame() {
 		return this;
 	}
@@ -252,6 +273,7 @@ class Client extends CSocket{
 			game.getWorld().getPlayer(pac.getId()).setConnect(false);
 		}
 		if(packet instanceof SPacketShoot) {
+			game.playSound("sfx_laser1.ogg");
 			SPacketShoot pac = (SPacketShoot) packet;
 			float speed = 1000f;
 			float moX = (float) (Math.cos(pac.getAngle()) * speed);
