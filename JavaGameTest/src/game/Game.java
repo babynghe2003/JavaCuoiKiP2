@@ -28,6 +28,7 @@ import game.entity.Player;
 import game.utils.Helper;
 import game.world.World;
 import network.custom.Packet;
+import network.custom.cpacket.CPacketJoin;
 import network.custom.spacket.SPacketDamage;
 import network.custom.spacket.SPacketPlayerDisconnect;
 import network.custom.spacket.SPacketPlayerPosition;
@@ -58,13 +59,15 @@ public class Game extends JPanel implements IRender, MouseListener, MouseMotionL
 	Image imageWarning;
 
 
-	public Game(int port, String host) throws UnknownHostException, IOException {
+	public Game(int port, String host, String name) throws UnknownHostException, IOException {
 		setFocusable(true);
 		addMouseMotionListener(this);
 		addKeyListener(this);
 		addMouseListener(this);
 		Client client = new Client(host, port, getGame());
 		player = new MyPlayer(client);
+		player.setName(name);
+		client.sendPacket(new CPacketJoin(name, 0, 0, 100));
 		world = new World(1000);
 		world.getQueue().add(player);
 		gameState = new GameState();
@@ -100,7 +103,7 @@ public class Game extends JPanel implements IRender, MouseListener, MouseMotionL
 	}
 	public static void main(String[] args) throws UnknownHostException, IOException {
 		JFrame frame = new JFrame();
-		Game game = new Game(25565,"localhost");
+		Game game = new Game(25565,"localhost","Player");
 		frame.setLayout(new BorderLayout());
 		frame.setSize(500, 500);
 		frame.add(game, BorderLayout.CENTER);
@@ -265,6 +268,7 @@ class Client extends CSocket{
 			player.setPosY(pac.getPosY());
 			player.setHealth(pac.getHealth());
 			player.setConnect(true);
+			player.setName(pac.getName());
 			game.getWorld().getQueue().add(player);
 		}
 		if(packet instanceof SPacketPlayerPosition) {

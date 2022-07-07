@@ -21,7 +21,7 @@ public class CServer {
 	public void onClientDisconnect(CSocket cSocket) {
 		System.out.println("disconnect");
 	}
-	public void onClientPacket(CSocket cSocket, Packet cPacket) {
+	public synchronized void onClientPacket(CSocket cSocket, Packet cPacket) {
 		System.out.println("packet" + cPacket);
 	}
 	public void listen() {

@@ -55,8 +55,10 @@ public class Player extends Entity{
 		int x = (int) (getPosX() - w / 2);
 		int y = (int) (getPosY() - 60 - h);
 		g2d.drawRect(x,y,w,h);
+
 		g2d.fillRect(x,y,getHealth(),h);
-		g2d.drawString(getHealth() + "", x, y);
+		// g2d.drawString(getHealth() + "", x, y);
+		g2d.drawString(getName() + "", x, y-5 );
 	}
 
 	public float getAngle() {

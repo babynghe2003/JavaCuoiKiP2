@@ -71,7 +71,7 @@ public class CSocket {
 	public void onDisconnect() {
 		System.out.println("Disconnect");
 	}
-	public void onPacket(Packet packet) {
+	public synchronized void onPacket(Packet packet) {
 		System.out.println(packet);
 	}
 	public synchronized void sendPacket(Packet packet) {

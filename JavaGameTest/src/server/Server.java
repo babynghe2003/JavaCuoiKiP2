@@ -12,6 +12,7 @@ import network.custom.CSocket;
 import network.custom.Packet;
 import network.custom.cpacket.CPacketDamage;
 import network.custom.cpacket.CPacketDisconnect;
+import network.custom.cpacket.CPacketJoin;
 import network.custom.cpacket.CPacketPlayerPosition;
 import network.custom.cpacket.CPacketShoot;
 import network.custom.spacket.*;
@@ -31,21 +32,22 @@ public class Server extends CServer{
 	
 	@Override
 	public void onClientConnect(CSocket cSocket) {
-		cSocket.sendPacket(new SPacketInitWorld(1000));
-		OtherPlayer player = new OtherPlayer();
-		player.setId(index);
-		player.setPosX(0);
-		player.setPosY(0);
-		cSocket.sendPacket(new SPacketSetID(player.getId(), player.getPosX(), player.getPosY()));
-		index++;
-		players.forEach((socket, pl)->{
-			System.out.println(pl.getHealth());
-			cSocket.sendPacket(new SPacketSpawnPlayer(pl.getId(), pl.getPosX(), pl.getPosY(), pl.getHealth()));
-			socket.sendPacket(new SPacketSpawnPlayer(player.getId(), player.getPosX(), player.getPosY(), player.getHealth()));
-		});
-		players.put(cSocket, player);
-		world.getEntities().add(player);		
-		super.onClientConnect(cSocket);
+		// cSocket.sendPacket(new SPacketInitWorld(1000));
+		// OtherPlayer player = new OtherPlayer();
+		// player.setId(index);
+		// player.setPosX(0);
+		// player.setPosY(0);
+		// player.setName("abc");
+		// cSocket.sendPacket(new SPacketSetID(player.getId(), player.getPosX(), player.getPosY()));
+		// index++;
+		// players.forEach((socket, pl)->{
+		// 	cSocket.sendPacket(new SPacketSpawnPlayer(pl.getId(), pl.getPosX(), pl.getPosY(), pl.getHealth(),pl.getName()));
+		// 	socket.sendPacket(new SPacketSpawnPlayer(player.getId(), player.getPosX(), player.getPosY(), player.getHealth(),player.getName()));
+		// });
+		// players.put(cSocket, player);
+		// world.getEntities().add(player);		
+		// super.onClientConnect(cSocket);
+
 	}
 	@Override
 	public void onClientDisconnect(CSocket cSocket) {
@@ -97,6 +99,24 @@ public class Server extends CServer{
 			if(player == null) return;
 			players.remove(cSocket);
 			onClientDisconnect(cSocket);
+		}
+		if(cPacket instanceof CPacketJoin){
+			cSocket.sendPacket(new SPacketInitWorld(1000));
+			CPacketJoin pac = (CPacketJoin) cPacket;
+			OtherPlayer player = new OtherPlayer();
+			player.setId(index);
+			player.setPosX(pac.getPosX());
+			player.setPosY(pac.getPosY());
+			player.setName(pac.getName());
+			player.setHealth(pac.getHealth());
+			cSocket.sendPacket(new SPacketSetID(player.getId(), player.getPosX(), player.getPosY()));
+			index++;
+			players.forEach((socket, pl)->{
+				cSocket.sendPacket(new SPacketSpawnPlayer(pl.getId(), pl.getPosX(), pl.getPosY(), pl.getHealth(),pl.getName()));
+				socket.sendPacket(new SPacketSpawnPlayer(player.getId(), player.getPosX(), player.getPosY(), player.getHealth(),player.getName()));
+			});
+			players.put(cSocket, player);
+			world.getEntities().add(player);		
 		}
 	}
 }

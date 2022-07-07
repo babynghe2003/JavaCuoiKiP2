@@ -60,7 +60,7 @@ public class MyPlayer extends Player{
 			setIsConnect(false);
 			socket.sendPacket(new CPacketDisconnect(getId()));
 		}
-		float speed = 3;
+		float speed = 6;
 
 		if(game.getGameState().getKeyboard()[KeyEvent.VK_A]) {
 			setPosX(getPosX()-speed);
@@ -84,7 +84,7 @@ public class MyPlayer extends Player{
 		//
 		if(game.getGameState().getMouse()[1]) {
 			long time = new Date().getTime();
-			if(time - lastShoot > 100) {
+			if(time - lastShoot > 200) {
 				//set angle to mouse
 				float angle = (float) (Math.atan2(game.getGameState().getMouseY() - game.getHeight()/2, game.getGameState().getMouseX() - game.getWidth()/2));
 				// float angle = (float) (getAngle() - Math.PI / 2);
